@@ -1,0 +1,1310 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>電子商務知識心智圖</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.263.1/umd/lucide.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .mindmap {
+            background: white;
+            border-radius: 20px;
+            padding: 60px 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            position: relative;
+        }
+
+        .center-node {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            border-radius: 50%;
+            text-align: center;
+            font-size: 1.5em;
+            font-weight: bold;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            width: 200px;
+            height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            z-index: 10;
+            line-height: 1.4;
+        }
+
+        .sections-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            min-height: 800px;
+        }
+
+        .left-section, .right-section {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .category {
+            margin-bottom: 15px;
+        }
+
+        .category-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #764ba2;
+            margin-bottom: 15px;
+            padding: 10px 15px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e8ecf4 100%);
+            border-left: 5px solid #764ba2;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .node {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 14px 16px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            position: relative;
+            font-size: 0.9em;
+            min-height: 50px;
+        }
+
+        .node:hover {
+            transform: translateX(5px) scale(1.02);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .node i {
+            flex-shrink: 0;
+            width: 20px;
+            height: 20px;
+        }
+
+        .node span {
+            flex: 1;
+            line-height: 1.4;
+        }
+
+        .relation-badge {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            font-size: 0.65em;
+            padding: 2px 6px;
+            border-radius: 8px;
+            margin-left: 5px;
+        }
+
+        .icon-badge {
+            background: rgba(118, 75, 162, 0.1);
+            padding: 4px 8px;
+            border-radius: 8px;
+            font-size: 0.75em;
+            color: #764ba2;
+            font-weight: 600;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            max-width: 900px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            position: relative;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: #764ba2;
+            color: white;
+            border: none;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .modal-close:hover {
+            background: #667eea;
+            transform: rotate(90deg);
+        }
+
+        .modal-title {
+            color: #764ba2;
+            font-size: 2em;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            border-bottom: 3px solid #764ba2;
+            padding-bottom: 15px;
+        }
+
+        .modal-section {
+            margin-bottom: 25px;
+        }
+
+        .modal-section h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 1.3em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .modal-section p {
+            line-height: 1.8;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .modal-section ul {
+            list-style: none;
+            padding-left: 20px;
+        }
+
+        .modal-section li {
+            padding: 8px 0;
+            position: relative;
+            line-height: 1.6;
+        }
+
+        .modal-section li:before {
+            content: "▸";
+            position: absolute;
+            left: -15px;
+            color: #764ba2;
+            font-weight: bold;
+        }
+
+        .relation-tag {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 0.85em;
+            margin: 5px 5px 5px 0;
+        }
+
+        @media (max-width: 1400px) {
+            .sections-container {
+                grid-template-columns: 1fr;
+                gap: 30px;
+                min-height: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🛒 電子商務知識心智圖</h1>
+        
+        <div class="mindmap">
+            <div class="sections-container">
+                <div class="left-section">
+                    <div class="category">
+                        <div class="category-title">
+                            <i data-lucide="compass"></i>
+                            EC 基礎
+                        </div>
+                        <div class="node" onclick="showDetail('ec-definition')">
+                            <i data-lucide="shopping-cart"></i>
+                            <span>EC 定義與商業過程</span>
+                            <span class="icon-badge">基礎</span>
+                        </div>
+                        <div class="node" onclick="showDetail('ec-framework')">
+                            <i data-lucide="layout-grid"></i>
+                            <span>EC 整體環境 (四層架構)</span>
+                        </div>
+                        <div class="node" onclick="showDetail('ec-flows')">
+                            <i data-lucide="arrow-right-left"></i>
+                            <span>EC 七流 (功能機能)</span>
+                        </div>
+                    </div>
+
+                    <div class="category">
+                        <div class="category-title">
+                            <i data-lucide="briefcase"></i>
+                            EC 分類 - 依交易對象
+                        </div>
+                        <div class="node" onclick="showDetail('b2c')">
+                            <i data-lucide="store"></i>
+                            <span>B2C 企業對消費者</span>
+                        </div>
+                        <div class="node" onclick="showDetail('b2b')">
+                            <i data-lucide="building-2"></i>
+                            <span>B2B 企業對企業</span>
+                        </div>
+                        <div class="node" onclick="showDetail('c2c')">
+                            <i data-lucide="users"></i>
+                            <span>C2C 消費者對消費者</span>
+                        </div>
+                        <div class="node" onclick="showDetail('c2b')">
+                            <i data-lucide="user-check"></i>
+                            <span>C2B 消費者對企業<span class="relation-badge">→團購</span></span>
+                        </div>
+                        <div class="node" onclick="showDetail('p2p')">
+                            <i data-lucide="user-cog"></i>
+                            <span>P2P 點對點<span class="relation-badge">→群募/借貸</span></span>
+                        </div>
+                        <div class="node" onclick="showDetail('o2o')">
+                            <i data-lucide="link"></i>
+                            <span>O2O 線上到線下<span class="relation-badge">→iBeacon</span></span>
+                        </div>
+                        <div class="node" onclick="showDetail('b2b2c')">
+                            <i data-lucide="shopping-basket"></i>
+                            <span>B2B2C 平台模式<span class="relation-badge">→Amazon</span></span>
+                        </div>
+                        <div class="node" onclick="showDetail('cross-border')">
+                            <i data-lucide="globe-2"></i>
+                            <span>跨境電子商務</span>
+                        </div>
+                    </div>
+                    
+                    <div class="category">
+                        <div class="category-title">
+                            <i data-lucide="megaphone"></i>
+                            網路行銷 - 核心
+                        </div>
+                        <div class="node" onclick="showDetail('mkt-4p')">
+                            <i data-lucide="tags"></i>
+                            <span>EC 的 4P 策略</span>
+                        </div>
+                        <div class="node" onclick="showDetail('mkt-sem')">
+                            <i data-lucide="search"></i>
+                            <span>SEM 搜尋引擎行銷</span>
+                        </div>
+                        <div class="node" onclick="showDetail('mkt-seo')">
+                            <i data-lucide="gem"></i>
+                            <span>SEO 搜尋引擎最佳化</span>
+                        </div>
+                        <div class="node" onclick="showDetail('mkt-long-tail')">
+                            <i data-lucide="bar-chart-horizontal"></i>
+                            <span>長尾行銷</span>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="right-section">
+                    <div class="category">
+                        <div class="category-title">
+                            <i data-lucide="server"></i>
+                            EC 經營模式
+                        </div>
+                        <div class="node" onclick="showDetail('model-portal')">
+                            <i data-lucide="mouse-pointer-square"></i>
+                            <span>入口網站 (Portal)</span>
+                        </div>
+                        <div class="node" onclick="showDetail('model-retailer')">
+                            <i data-lucide="truck"></i>
+                            <span>線上零售商 (e-tailer)</span>
+                        </div>
+                        <div class="node" onclick="showDetail('model-content')">
+                            <i data-lucide="file-text"></i>
+                            <span>線上內容提供者</span>
+                        </div>
+                        <div class="node" onclick="showDetail('model-broker')">
+                            <i data-lucide="briefcase"></i>
+                            <span>線上仲介商 (Broker)</span>
+                        </div>
+                        <div class="node" onclick="showDetail('model-market-maker')">
+                            <i data-lucide="landmark"></i>
+                            <span>線上市場創造者</span>
+                        </div>
+                        <div class="node" onclick="showDetail('model-community')">
+                            <i data-lucide="message-circle"></i>
+                            <span>線上社群提供者</span>
+                        </div>
+                        <div class="node" onclick="showDetail('model-asp')">
+                            <i data-lucide="cloud"></i>
+                            <span>應用服務提供者 (ASP/Cloud)</span>
+                        </div>
+                    </div>
+
+                    <div class="category">
+                        <div class="category-title">
+                            <i data-lucide="target"></i>
+                            網路行銷 - 策略
+                        </div>
+                        <div class="node" onclick="showDetail('mkt-recommend')">
+                            <i data-lucide="thumbs-up"></i>
+                            <span>推薦引擎<span class="relation-badge">→協同過濾</span></span>
+                        </div>
+                        <div class="node" onclick="showDetail('mkt-viral')">
+                            <i data-lucide="send"></i>
+                            <span>病毒式行銷 (口碑)</span>
+                        </div>
+                        <div class="node" onclick="showDetail('mkt-kol')">
+                            <i data-lucide="star"></i>
+                            <span>網紅行銷 (KOL)</span>
+                        </div>
+                        <div class="node" onclick="showDetail('mkt-inbound')">
+                            <i data-lucide="magnet"></i>
+                            <span>內拉式(集客式)行銷</span>
+                        </div>
+                        <div class="node" onclick="showDetail('mkt-permission')">
+                            <i data-lucide="mail-check"></i>
+                            <span>允許式行銷<span class="relation-badge">→Opt-in</span></span>
+                        </div>
+                        <div class="node" onclick="showDetail('mkt-association')">
+                            <i data-lucide="link-2"></i>
+                            <span>聯盟式行銷</span>
+                        </div>
+                        <div class="node" onclick="showDetail('mkt-behavioral')">
+                            <i data-lucide="eye"></i>
+                            <span>行為目標行銷<span class="relation-badge">→Cookie</span></span>
+                        </div>
+                         <div class="node" onclick="showDetail('mkt-intelligent')">
+                            <i data-lucide="brain"></i>
+                            <span>智慧行銷<span class="relation-badge">→AI/Chatbot</span></span>
+                        </div>
+                    </div>
+                    
+                    <div class="category">
+                        <div class="category-title">
+                            <i data-lucide="cloud-cog"></i>
+                            EC 相關技術與趨勢
+                        </div>
+                        <div class="node" onclick="showDetail('omni-channel')">
+                            <i data-lucide="combine"></i>
+                            <span>商業 4.0 / 全通路 / 新零售</span>
+                        </div>
+                        <div class="node" onclick="showDetail('cloud-definition')">
+                            <i data-lucide="cloud"></i>
+                            <span>雲端運算定義與特徵</span>
+                        </div>
+                        <div class="node" onclick="showDetail('cloud-iaas')">
+                            <i data-lucide="server"></i>
+                            <span>IaaS 基礎設施即服務</span>
+                        </div>
+                        <div class="node" onclick="showDetail('cloud-paas')">
+                            <i data-lucide="box"></i>
+                            <span>PaaS 平台即服務</span>
+                        </div>
+                        <div class="node" onclick="showDetail('cloud-saas')">
+                            <i data-lucide="app-window"></i>
+                            <span>SaaS 軟體即服務</span>
+                        </div>
+                        <div class="node" onclick="showDetail('cloud-deployment')">
+                            <i data-lucide="cloud-cog"></i>
+                            <span>雲端部署模式 (公/私/混合)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="modal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal()">×</button>
+            <div id="modal-body"></div>
+        </div>
+    </div>
+
+    <script>
+        const content = {
+            'ec-definition': {
+                title: 'EC - 電子商務定義',
+                icon: 'shopping-cart',
+                relations: ['ec-framework', 'ec-flows', 'mkt-4p'],
+                sections: [
+                    {
+                        title: '📌 定義 (Zwass, 1996)',
+                        content: '以網路科技為基礎，來支援企業與客戶買賣之間的 (1)資訊分享、(2)交易執行 及 (3)關係維持 的一些流程系統與經營模式。 [cite: 209]'
+                    },
+                    {
+                        title: '🔄 商業交易過程 (三重點)',
+                        list: [
+                            '資訊分享 (行銷): 買賣雙方線上資訊提供與分享，如行銷4P資訊、消費者偏好。 [cite: 210, 211]',
+                            '交易執行 (銷售): 線上交易的執行，如線上採購、線上付款、線上運送。 [cite: 212, 213]',
+                            '關係維持 (服務): 雙方線上的互動、溝通與服務等關係的建立與維持，如線上FAQ、線上客服中心。 [cite: 214, 215]'
+                        ]
+                    }
+                ]
+            },
+            'ec-framework': {
+                title: 'EC - 整體環境 (四層架構)',
+                icon: 'layout-grid',
+                relations: ['ec-definition', 'model-asp', 'cloud-definition'],
+                sections: [
+                    {
+                        title: '📌 EC 整體環境 (基本架構)',
+                        content: 'EC 的環境由四個層次堆疊而成，並由倫理法律規範所支援。 [cite: 883, 890, 907]',
+                        list: [
+                            '層次1: 網路基礎設施 (Network Infrastructure): 構成 Internet 的實體網路、Wi-Fi、行動網路及所需電腦通訊設備。 [cite: 896, 912, 913]',
+                            '層次2: 商務基礎設施 (Business Infrastructure): 支援交易的通用機制，如 (1)交易金流 (電子錢包、信用卡) [cite: 931]、(2)交易安全 (數位簽章、加密) [cite: 932]、(3)交易資訊 (搜尋引擎、電子目錄) [cite: 933]。',
+                            '層次3: EC 商務應用 (EC Application): 運用前兩層組合出的應用，如 (1)資訊蒐集 (行銷廣告) [cite: 935]、(2)價格決定 (線上拍賣) [cite: 936]、(3)線上交易 (網路下單) [cite: 937]、(4)線上服務 (線上客服) [cite: 938]、(5)社群 (線上論壇) [cite: 939]。',
+                            '層次4: EC 經營模式 (EC Business Model): 企業為目標客群提供價值並獲利的方式，如入口網站、線上零售商等。 [cite: 886, 909, 911]'
+                        ]
+                    },
+                    {
+                        title: '⚖️ 支援層',
+                        content: '倫理及法律等相關規範: 如電子文件效力、網路著作權、個人隱私保護、稅捐與關稅等。 [cite: 882, 915, 941]'
+                    }
+                ]
+            },
+            'ec-flows': {
+                title: 'EC - 七流 (功能機能)',
+                icon: 'arrow-right-left',
+                relations: ['ec-definition', 'b2b'],
+                sections: [
+                    {
+                        title: '📌 商業機能五流',
+                        content: '企業經營必須掌握的五種流程： [cite: 1575]',
+                        list: [
+                            '商流 (Business flow): 商品所有權轉移。 [cite: 1577]',
+                            '物流 (Logistics flow): 實體物品流動運送。 [cite: 1578]',
+                            '金流 (Cash flow): 透過金融體系完成付款。 [cite: 1579]',
+                            '資訊流 (Information flow): 資訊流通與交換。 [cite: 1580]',
+                            '服務流 (Service flow): 售前到售後的顧客滿意服務。 [cite: 1592]'
+                        ]
+                    },
+                    {
+                        title: '🚀 EC 七流',
+                        content: 'EC 角度將五流 e 化並延伸為七流： [cite: 1421, 1602]',
+                        list: [
+                            '主要流: 商流、物流、金流 (強調付款系統與安全 [cite: 1603])、資訊流 (強調即時與加值情報 [cite: 1604])。',
+                            '次要流: 服務流 (強調整合線上線下服務 [cite: 1606])、人才流 (培育EC人才) [cite: 1618]、設計流 (B2B協同設計或B2C網站介面設計) [cite: 1618]。'
+                        ]
+                    }
+                ]
+            },
+            'b2c': {
+                title: 'B2C - 企業對消費者',
+                icon: 'store',
+                relations: ['model-retailer', 'o2o', 'mkt-4p'],
+                sections: [
+                    {
+                        title: '📌 定義',
+                        content: '賣方為商業機構，買方為個人。 [cite: 560] 又稱為「消費性電子商務」或「電子零售」(e-tailing)。 [cite: 561, 562]'
+                    },
+                    {
+                        title: '🎯 應用',
+                        content: '即企業將商品搬上網路銷售。 [cite: 563]',
+                        list: [
+                            'Uniqlo 線上購物 [cite: 563]',
+                            '鼎泰豐線上購物 [cite: 563]',
+                            'PChome 24h 購物 [cite: 1149]',
+                            'Amazon.com [cite: 1149]'
+                        ]
+                    }
+                ]
+            },
+            'b2b': {
+                title: 'B2B - 企業對企業',
+                icon: 'building-2',
+                relations: ['ec-flows', 'b2b2c'],
+                sections: [
+                    {
+                        title: '📌 定義',
+                        content: '買賣雙方都為商業機構。 [cite: 557] 針對企業內部及企業與上下游協力廠商間的資訊整合，並在網際網路上進行的企業間交易。 [cite: 558]'
+                    },
+                    {
+                        title: '💡 衍生模式: 協同商務 (c-commerce)',
+                        content: '在 B2B 基礎上，使供應鏈上的不同成員進行協同產品設計、行銷、採購、物流等。 [cite: 559] (例如 SAP Ariba [cite: 559])'
+                    }
+                ]
+            },
+            'c2c': {
+                title: 'C2C - 消費者對消費者',
+                icon: 'users',
+                relations: ['p2p', 'b2b2c'],
+                sections: [
+                    {
+                        title: '📌 定義',
+                        content: '買賣雙方都為個人，類似現實的跳蚤市場。 [cite: 584, 585] 通常會有一個電子交易平台供應商(如拍賣網站)，從交易中收取佣金。 [cite: 585]'
+                    },
+                    {
+                        title: '🎯 應用',
+                        list: [
+                            'eBay [cite: 586]',
+                            '露天拍賣 [cite: 586]',
+                            'Yahoo! 奇摩拍賣 [cite: 586]'
+                        ]
+                    },
+                    {
+                        title: '🆚 P2P vs. C2C [cite: 761]',
+                        content: 'C2C 側重於商品買賣，並依賴電子商務平台作為中介 [cite: 767, 770]；P2P 側重於去中心化的資源交換 (如金融、數據)，平台僅提供撮合服務 [cite: 766, 769]。'
+                    }
+                ]
+            },
+            'c2b': {
+                title: 'C2B - 消費者對企業',
+                icon: 'user-check',
+                relations: ['p2p', 'o2o'],
+                sections: [
+                    {
+                        title: '📌 定義',
+                        content: '由消費者提出對產品或服務的需求，而不同的商業機構競爭提供該產品或服務的機會。 [cite: 659, 660]'
+                    },
+                    {
+                        title: '🎯 應用: 團購/合購',
+                        content: '最常見的 C2B 模式即為團購或合購網站。 [cite: 567, 660]',
+                        list: [
+                            'ihergo 愛合購 [cite: 660]',
+                            'SISGO [cite: 660]'
+                        ]
+                    }
+                ]
+            },
+            'p2p': {
+                title: 'P2P - 點對點',
+                icon: 'user-cog',
+                relations: ['c2c', 'c2b'],
+                sections: [
+                    {
+                        title: '📌 定義',
+                        content: '供需雙方直接點對點的交易，而沒有透過任何仲介商。 [cite: 707, 708] 屬於共享經濟 (Share Economics) 的一種。 [cite: 708]'
+                    },
+                    {
+                        title: '💡 主要類型',
+                        list: [
+                            '群眾募資 (Crowdfunding): 個人或小企業透過網路向大眾募集資金，以實現創意計畫或產品量產。 [cite: 708, 709] (例如: Kickstarter, flyingV [cite: 713, 714])',
+                            '網路借貸 (P2P Lending): 個體和個體間通過網路平台實現直接借貸。 [cite: 708, 741] (例如: 英國 Zopa.com [cite: 742], 台灣 鄉民貸 [cite: 744])'
+                        ]
+                    }
+                ]
+            },
+            'o2o': {
+                title: 'O2O - 線上到線下',
+                icon: 'link',
+                relations: ['omni-channel', 'b2c'],
+                sections: [
+                    {
+                        title: '📌 定義',
+                        content: 'Online to Offline，指以網路作為線下交易的前台，從線上進行引導，並於線下消費的一種交易模式。 [cite: 789, 790]'
+                    },
+                    {
+                        title: '🎯 應用',
+                        content: 'O2O 模式將線上線下整合，消費者可以通過網路對商品或服務進行篩選或付款。 [cite: 790]',
+                        list: [
+                            '團購網 (GOMAJI): 販售優惠券，將餐飲、旅行等行業納入O2O。 [cite: 792]',
+                            '即時 O2O (iBeacon): 利用 iBeacon 技術，使消費者在店面購物時能即時獲取促銷資訊。 [cite: 793, 807]',
+                            'Amazon Home Services: 提供房屋修繕、汽車修理等實體服務。 [cite: 791]'
+                        ]
+                    }
+                ]
+            },
+            'b2b2c': {
+                title: 'B2B2C - 平台服務模式',
+                icon: 'shopping-basket',
+                relations: ['b2b', 'c2c', 'model-market-maker'],
+                sections: [
+                    {
+                        title: '📌 定義',
+                        content: 'Business to Business to Consumer。指由電子商務平台 (第二個 B) 提供金流、物流等服務，供第三方企業 (第一個 B) 從事電子商務，銷售給消費者 (C)。 [cite: 776, 777]'
+                    },
+                    {
+                        title: '💡 特性',
+                        content: 'B2B2C 是 B2C (品質保證但商店少 [cite: 779]) 和 C2C (貨源豐富但品質不一 [cite: 780]) 的折衷。平台非簡單中介，而是提供客戶管理、資料庫管理等高附加價值服務的渠道機構。 [cite: 781, 783]'
+                    },
+                    {
+                        title: '🎯 應用',
+                        list: [
+                            'Amazon [cite: 777]',
+                            '阿里巴巴 [cite: 777]',
+                            'Yahoo! 超級商城 [cite: 777]',
+                            'PChome 商店街 [cite: 777]'
+                        ]
+                    }
+                ]
+            },
+            'cross-border': {
+                title: '跨境電子商務',
+                icon: 'globe-2',
+                relations: ['b2c', 'b2b'],
+                sections: [
+                    {
+                        title: '📌 定義',
+                        content: 'Cross-border EC，指消費者和賣家在不同的「關境」(海關關稅法適用的領域)，透過電子商務平台完成交易、支付結算與國際物流送貨的一種國際商業活動。 [cite: 824, 825]'
+                    },
+                    {
+                        title: '📈 趨勢',
+                        content: '全球跨境 B2C 交易量佔總 B2C 交易的比例逐年增長，從 2014 年的 14.6% 預計增長到 2020 年的 29.3%。 [cite: 830, 831, 839, 832]'
+                    }
+                ]
+            },
+            'mkt-4p': {
+                title: 'EC 的 4P 策略',
+                icon: 'tags',
+                relations: ['ec-definition', 'mkt-sem', 'mkt-long-tail'],
+                sections: [
+                    {
+                        title: '📌 傳統行銷 4P',
+                        content: '由 Jerome McCarthy (1960) 提出，包含: [cite: 2362]',
+                        list: [
+                            '產品 (Product): 設計、特性、包裝、服務。 [cite: 2363]',
+                            '價格 (Price): 定價、折扣、付款條件。 [cite: 2364]',
+                            '促銷 (Promotion): 廣告、直銷、公共關係。 [cite: 2365]',
+                            '通路 (Place): 通路、涵蓋區域、運輸、存貨。 [cite: 2366]'
+                        ]
+                    },
+                    {
+                        title: '🛒 EC 上的 4P 策略',
+                        content: 'EC 利用網路特性，擴展了 4P 的策略： [cite: 2398]',
+                        list: [
+                            '產品 (Product): 量身訂製 [cite: 2436]、大量客製化 [cite: 2437]、消費者協同研發 [cite: 2438]、線上維修 [cite: 2440]。',
+                            '價格 (Price): 微定價 [cite: 2424]、版本定價 [cite: 2425]、線上拍賣 [cite: 2426]、線上逆向拍賣 [cite: 2427]、線上團購 [cite: 2428]。',
+                            '通路 (Place): 通路去中間化 [cite: 2430]、通路再中間化 [cite: 2431]、虛實合一通路 [cite: 2433]、聯盟行銷通路 [cite: 2435]。',
+                            '促銷 (Promotion): (見其他行銷節點) 搜尋引擎行銷、推薦引擎、病毒式行銷等。 [cite: 2414-2423]'
+                        ]
+                    }
+                ]
+            },
+            'mkt-sem': {
+                title: 'SEM - 搜尋引擎行銷',
+                icon: 'search',
+                relations: ['mkt-seo', 'mkt-long-tail', 'mkt-inbound'],
+                sections: [
+                    {
+                        title: '📌 定義 (Search Engine Marketing)',
+                        content: '利用搜尋引擎來進行行銷活動。 [cite: 2445, 2464, 2225] 這是消費者線上蒐集資訊的主要工具，也是良好的目標行銷工具。 [cite: 2486, 2487]'
+                    },
+                    {
+                        title: '💡 兩種主要方式 [cite: 2464]',
+                        list: [
+                            '關鍵字行銷 (Keyword Marketing): 「用錢」。 [cite: 2465] 廣告主購買關鍵字，當用戶搜尋時顯示廣告 (如 Google AdWords)。 [cite: 2465, 2246] 收費低且以「績效導向」(Pay-by-Click) 計價。 [cite: 2488]',
+                            '搜尋引擎最佳化 (SEO): 「用技術」。 [cite: 2466] 利用網頁設計技巧，使自己網站在「自然搜尋」結果中排名靠前。 [cite: 2466, 2247]'
+                        ]
+                    }
+                ]
+            },
+            'mkt-seo': {
+                title: 'SEO - 搜尋引擎最佳化',
+                icon: 'gem',
+                relations: ['mkt-sem', 'mkt-inbound'],
+                sections: [
+                    {
+                        title: '📌 定義 (Search Engine Optimization)',
+                        content: '透過了解搜尋引擎的搜尋規則來調整網站內容與架構，以提高網站在搜尋引擎內的排名。 [cite: 2466, 2247, 2259]'
+                    },
+                    {
+                        title: '🔑 SEO 排名指標 (三大構面) [cite: 2504]',
+                        list: [
+                            '網站的口碑與普及性 (Reputation & Popularity): 根據社群網路指標(按讚、討論) [cite: 2561]、網站流量 [cite: 2561]、與其他高品質網站的鏈結 (Backlinks) [cite: 2561] 來判斷。',
+                            '與關鍵字的相關性 (Relevancy): 根據網頁關鍵字 [cite: 2567]、網頁標題 [cite: 2567]、內文的相關詞句 [cite: 2567]、點擊率(SERP Click-through Rate) [cite: 2567] 等判斷。',
+                            '使用者滿意度 (Satisfaction): 根據網站停留時間 (Dwell Time) [cite: 2576]、網頁速度 [cite: 2576]、跳離率 (Bounce Rate) [cite: 2576]、是否被駭或有垃圾郵件 [cite: 2576] 等判斷。'
+                        ]
+                    }
+                ]
+            },
+            'mkt-long-tail': {
+                title: '長尾行銷',
+                icon: 'bar-chart-horizontal',
+                relations: ['mkt-4p', 'mkt-sem'],
+                sections: [
+                    {
+                        title: '📌 定義 (Long Tail)',
+                        content: '由 Chris Anderson (2004) 提出。 [cite: 2899] 指只要通路夠大，非主流的、需求量小的「利基」商品，其「總銷量」也能夠和主流的、需求量大的「熱門」商品銷量抗衡。 [cite: 2283, 2898] 這顛覆了 80/20 法則。 [cite: 2898]'
+                    },
+                    {
+                        title: '🔗 與 EC 的關係',
+                        content: '傳統商店受限於實體貨架空間，只能放暢銷商品。 [cite: 2902] 網路經濟體系 (EC) 帶來了長尾效應： [cite: 2902]',
+                        list: [
+                            '生產工具大眾化: 網路使人人都能成為商品提供者，增加商品種類 (尾巴拉長)。 [cite: 2288, 2912]',
+                            '配銷工具大眾化: EC 網站除去地理與貨架限制，讓冷門商品得以曝光 (尾巴變粗)。 [cite: 2289, 2912]',
+                            '供應與需求的有效連結: 透過搜尋引擎 (SEM/SEO) 和推薦引擎，降低消費者搜尋成本，激發利基商品的需求 (尾巴重心右移)。 [cite: 2290, 2912]'
+                        ]
+                    },
+                    {
+                        title: '🎯 應用',
+                        content: 'Google 的 AdSense 服務。數以百萬計的中小企業和個人廣告需求(長尾市場)，透過 Google 的自助式廣告平台得以實現。 [cite: 2291]'
+                    }
+                ]
+            },
+            'model-portal': {
+                title: '經營模式 - 入口網站 (Portal)',
+                icon: 'mouse-pointer-square',
+                relations: ['model-content', 'mkt-sem'],
+                sections: [
+                    {
+                        title: '📌 定義',
+                        content: '主要提供網站的搜尋、連結及各種內容，來支援瀏覽者到達其有興趣的最終網站，主要以獲取「廣告收入」為主。 [cite: 1074] 提供電子商務的 5C 特點 (連結, 內容, 商務, 社群, 個人化)。 [cite: 1082]'
+                    },
+                    {
+                        title: '💡 類型 [cite: 1083]',
+                        list: [
+                            '水平入口網站 (Horizontal Portal): 目標市場為一般上網使用者。 (例如: Google, Yahoo!) [cite: 1083, 1074]',
+                            '垂直入口網站 (Vertical Portal / Vortal): 針對特定產業或市場區隔做深度經營。 (例如: CNET (科技), ESPN (運動)) [cite: 1083, 1074]'
+                        ]
+                    }
+                ]
+            },
+            'model-retailer': {
+                title: '經營模式 - 線上零售商 (e-tailer)',
+                icon: 'truck',
+                relations: ['b2c', 'omni-channel'],
+                sections: [
+                    {
+                        title: '📌 定義',
+                        content: '販賣由製造商所提供的「實體產品」給消費者，而賺取「銷售收入」。 [cite: 1147, 1149, 1074]'
+                    },
+                    {
+                        title: '🎯 應用',
+                        list: [
+                            'Amazon.com [cite: 1149, 1074]',
+                            'PChome 24h 購物 [cite: 1149]',
+                            'Wal-Mart.com (虛實合一) [cite: 1074]'
+                        ]
+                    }
+                ]
+            },
+            'model-content': {
+                title: '經營模式 - 線上內容提供者',
+                icon: 'file-text',
+                relations: ['model-portal'],
+                sections: [
+                    {
+                        title: '📌 定義 (Internet Content Provider, ICP)',
+                        content: '主要提供有「智慧財產權」的「數位內容」產品與娛樂，並賺取「訂閱收入」或「下載收入」。 [cite: 1150, 1151, 1074]'
+                    },
+                    {
+                        title: '🎯 應用',
+                        content: '包含數位遊戲、數位學習、數位影音、行動應用服務、數位出版等。 [cite: 1151, 1152]',
+                        list: [
+                            'CNN.com [cite: 1074]',
+                            'ESPN.com [cite: 1074]',
+                            'Netflix',
+                            'Spotify'
+                        ]
+                    }
+                ]
+            },
+            'model-broker': {
+                title: '經營模式 - 線上仲介商',
+                icon: 'briefcase',
+                relations: ['model-market-maker'],
+                sections: [
+                    {
+                        title: '📌 定義 (Online Broker)',
+                        content: '代表其客戶搜尋適當的交易對象，並協助其完成交易，以收取「佣金收入」為主，本身不提供產品。 [cite: 1242, 1244, 1074]'
+                    },
+                    {
+                        title: '🎯 應用',
+                        list: [
+                            'E*Trade (證券交易) [cite: 1244, 1074]',
+                            'ezfly.com (旅遊仲介) [cite: 1244, 1074]',
+                            '104 人力銀行 [cite: 1074]'
+                        ]
+                    }
+                ]
+            },
+            'model-market-maker': {
+                title: '經營模式 - 線上市場創造者',
+                icon: 'landmark',
+                relations: ['model-broker', 'b2b2c', 'p2p'],
+                sections: [
+                    {
+                        title: '📌 定義 (Online Market Maker)',
+                        content: '「創造」一個交易的市場、制訂交易規則、監督規範交易的履行，並建設交易平台，以收取「佣金收入」為主。 [cite: 1245, 1246, 1247, 1074]'
+                    },
+                    {
+                        title: '🎯 應用',
+                        list: [
+                            'eBay (線上拍賣市場) [cite: 1247, 1074]',
+                            'priceline.com (線上反向拍賣) [cite: 1247, 1074]',
+                            'B2B 交易市集 [cite: 1250]',
+                            'B2B2C 平台 (如 Amazon Marketplace) [cite: 1250]'
+                        ]
+                    }
+                ]
+            },
+            'model-community': {
+                title: '經營模式 - 線上社群提供者',
+                icon: 'message-circle',
+                relations: ['mkt-viral', 'mkt-kol'],
+                sections: [
+                    {
+                        title: '📌 定義 (Online Community Provider)',
+                        content: '聚集相同興趣的消費者形成一個「虛擬社群」來分享資訊、知識，甚至聚集需求來集體議價(團購)。 [cite: 1128, 1129, 1074] 收入以「廣告收入」與「佣金收入」為主。 [cite: 1074]'
+                    },
+                    {
+                        title: '🎯 應用',
+                        list: [
+                            'Facebook [cite: 1129, 1074]',
+                            'Instagram [cite: 1129]',
+                            '痞客邦 (Pixnet) [cite: 1129]',
+                            'ihergo 愛合購 (集體議價) [cite: 1129, 1074]'
+                        ]
+                    }
+                ]
+            },
+            'model-asp': {
+                title: '經營模式 - 應用服務提供者 (ASP)',
+                icon: 'cloud',
+                relations: ['cloud-definition', 'cloud-iaas', 'cloud-paas', 'cloud-saas', 'ec-framework'],
+                sections: [
+                    {
+                        title: '📌 定義 (Application Service Provider)',
+                        content: '在網站上「租賃」多種 Web 資訊系統 (如 EC, ERP, CRM) 並收取租賃費用，或是在「雲端」提供多種服務。 [cite: 1074, 1153]'
+                    },
+                    {
+                        title: '💡 演進',
+                        content: '此模式已演進為當今的雲端運算 (Cloud Computing)。 [cite: 1154]',
+                        list: [
+                            'IaaS (基礎設施服務): Amazon AWS [cite: 1156, 1074], Microsoft Azure [cite: 1155]',
+                            'PaaS (平台服務): SAP Cloud Platform [cite: 1195]',
+                            'SaaS (軟體服務): Google Workspace, Microsoft 365'
+                        ]
+                    }
+                ]
+            },
+            'mkt-recommend': {
+                title: '推薦引擎行銷',
+                icon: 'thumbs-up',
+                relations: ['mkt-long-tail', 'mkt-intelligent'],
+                sections: [
+                    {
+                        title: '📌 定義 (Recommendation Engine)',
+                        content: '一個能主動辨識出消費者「可能喜歡什麼」產品，並能適時「推播」(push) 給目標客戶的一種行銷技術與手法。 [cite: 2600, 2601] Amazon 有 35% 收入來自推薦引擎。 [cite: 2602]'
+                    },
+                    {
+                        title: '💡 三種主要技術 [cite: 2629]',
+                        list: [
+                            '內容導向的篩選 (Content-Based Filtering): 根據「自己的」歷史紀錄 (瀏覽、購買、願望清單) 來推薦。 [cite: 2630, 2631]',
+                            '協同篩選法 (Collaborative Filtering): 「用同好推薦」。利用與顧客偏好相「類似的其他顧客」的行為來推薦產品。 [cite: 2633, 2634]',
+                            '知識導向的篩選法 (Knowledge-based Filtering): 「用專家推薦」。利用過去統計分析獲得的「相關性指導原則」來推薦 (例如: 學生對零元手機較重視)。 [cite: 2635, 2636, 2638]'
+                        ]
+                    }
+                ]
+            },
+            'mkt-viral': {
+                title: '病毒式行銷 (口碑行銷)',
+                icon: 'send',
+                relations: ['mkt-kol', 'model-community'],
+                sections: [
+                    {
+                        title: '📌 定義 (Viral Marketing)',
+                        content: '又稱「線上評論與口碑」，模仿傳統行銷的「口耳相傳」(Word of Mouth)。 [cite: 2644, 2645] 就像病毒傳播一樣，主要依靠線上消費者貢獻的 4R 來傳遞。 [cite: 2645]'
+                    },
+                    {
+                        title: '🔑 關鍵 4R',
+                        list: [
+                            '線上評論 (Online Review) [cite: 2646]',
+                            '線上評等 (Online Rank) [cite: 2647]',
+                            '線上推薦 (Online Recommendation) [cite: 2648]',
+                            '線上引介 (Online Referral) (例如: 開箱文) [cite: 2649]'
+                        ]
+                    },
+                    {
+                        title: '💡 成功關鍵',
+                        content: '具「低成本、高曝光率」效益。 [cite: 2650] 關鍵是必須快速造成「風潮」或「流行」，確保「內容」能讓使用者瘋狂轉載 (例如: 無厘頭、荒謬、好笑的創意)。 [cite: 2651, 2652, 2653]'
+                    }
+                ]
+            },
+            'mkt-kol': {
+                title: '網紅行銷 (KOL)',
+                icon: 'star',
+                relations: ['mkt-viral', 'model-community'],
+                sections: [
+                    {
+                        title: '📌 定義 (Key Opinion Leader)',
+                        content: '指在社群平台 (Youtube, Facebook, Instagram, TikTok) 上，透過與網路名人 (KOL) 合作，「業配商品」或是「代言品牌」來達到行銷的目的。 [cite: 2658, 2659, 2660] 又稱「社群直播行銷」。 [cite: 2660]'
+                    },
+                    {
+                        title: '📊 網紅類型',
+                        content: '根據 KOL Radar 統計，網紅經營主題佔比前三名為：美食 (14.4%)、攝影 (8.3%)、穿搭 (7.8%)。 [cite: 2703, 2700, 2705]'
+                    }
+                ]
+            },
+            'mkt-inbound': {
+                title: '內拉式行銷 (集客式行銷)',
+                icon: 'magnet',
+                relations: ['mkt-sem', 'mkt-seo', 'mkt-viral'],
+                sections: [
+                    {
+                        title: '📌 定義 (Inbound Marketing)',
+                        content: '或稱「集客式行銷」，指的是企業利用各種方法，讓消費者非常容易、方便地「主動進入」其網站。 [cite: 2854, 2855] 這是一種「拉」(Pull) 的策略。'
+                    },
+                    {
+                        title: '💡 方法',
+                        content: '透過高品質的內容和良好的消費體驗，讓顧客主動上門，並將瀏覽轉換為採購。 [cite: 2860]',
+                        list: [
+                            '網頁上良好的內容 [cite: 2856]',
+                            '搜尋引擎最佳化 (SEO) [cite: 2880]',
+                            '社群網路上的良好排名 (口碑) [cite: 2857, 2858]',
+                            '部落格上跟顧客的良好互動 [cite: 2859, 2880]'
+                        ]
+                    },
+                    {
+                        title: '🆚 vs. 外推式行銷 (Outbound Marketing)',
+                        content: '外推式行銷是傳統「推播」(Push) 的策略，透過各種媒體廣告 (電視、網路廣告、E-mail) 強迫性地將產品訊息推給消費者。 [cite: 2844, 2845]'
+                    }
+                ]
+            },
+            'mkt-permission': {
+                title: '允許式行銷',
+                icon: 'mail-check',
+                relations: ['mkt-inbound'],
+                sections: [
+                    {
+                        title: '📌 定義 (Permission Marketing)',
+                        content: 'EC 廠商通知消費者，詢問其是否「願意」接受廣告，以取得消費者接受廣告的同意。 [cite: 2810, 2811]'
+                    },
+                    {
+                        title: '🔑 關鍵術語',
+                        list: [
+                            '選擇性加入 (Opt-in): 基於個資保護，使用者必須「勾選同意」才能發送。 [cite: 2812]',
+                            '雙重選擇加入 (Double Opt-in): 使用者同意後，系統會再發送一封 Email 或簡訊要求「再次確認」。 [cite: 2812, 2826] 這能避免蒐集到錯誤的 Email 位址並杜絕惡意訂閱。 [cite: 2829, 2830]',
+                            '選擇退出 (Opt-out): 提供使用者隨時取消訂閱的選項。 [cite: 2813]'
+                        ]
+                    }
+                ]
+            },
+            'mkt-association': {
+                title: '聯盟式行銷',
+                icon: 'link-2',
+                relations: ['mkt-4p', 'model-broker'],
+                sections: [
+                    {
+                        title: '📌 定義 (Association Marketing)',
+                        content: '各網站可透過「聯盟計畫」合作，將自己的網站當成一個入口，引導顧客點選到其他有興趣的「合作網站」，彼此交叉銷售，並互相收取「轉介佣金」(Reference Fee)。 [cite: 2454, 2584, 2585]'
+                    },
+                    {
+                        title: '🎯 應用',
+                        content: '常見於將食、衣、住、行、育、樂等「異業」進行聯盟。 [cite: 2586]',
+                        list: [
+                            '飯店 + 租車 + 機票 網站聯盟 [cite: 2586]',
+                            '菁鑽聯盟 (台灣飯店聯盟) [cite: 2590]'
+                        ]
+                    }
+                ]
+            },
+            'mkt-behavioral': {
+                title: '行為目標行銷',
+                icon: 'eye',
+                relations: ['mkt-sem', 'mkt-intelligent'],
+                sections: [
+                    {
+                        title: '📌 定義 (Behavioral Targeting)',
+                        content: '「網路廣告商」(如 Google 併購的 DoubleClick) 販售廣告空間給廣告主。 [cite: 2457, 2948] 廣告商透過在會員網站上放置「追蹤程式」(Cookies)，得以在網路上「追蹤」消費者行為 (例如跨網站的瀏覽紀錄)。 [cite: 2964, 2967, 2984]'
+                    },
+                    {
+                        title: '💡 運作方式',
+                        content: '廣告伺服器會根據追蹤到的「使用者檔案資料庫」，選擇一個最符合該使用者特徵的橫幅廣告進行投放。 [cite: 2954, 2958] 這能協助廣告主針對想要的團體或個人做精準行銷。 [cite: 2948]',
+                        list: [
+                            '消費者要求瀏覽會員網站 (如痞客邦)。 [cite: 2950, 2931]',
+                            '廠商 (痞客邦) 伺服器連結到廣告商 (DoubleClick) 伺服器。 [cite: 2956]',
+                            '廣告伺服器讀取消費者電腦中的 cookie，並檢查其檔案資料庫。 [cite: 2954, 2974]',
+                            '廣告伺服器根據檔案，選擇一個合適的廣告 (如 Yahoo 購物) 回傳並顯示。 [cite: 2958, 2946]'
+                        ]
+                    },
+                    {
+                        title: '⚠️ 爭議',
+                        content: '此種追蹤能力引發了嚴重的「隱私權」方面的爭議。 [cite: 2967, 2989]'
+                    }
+                ]
+            },
+            'mkt-intelligent': {
+                title: '智慧行銷',
+                icon: 'brain',
+                relations: ['mkt-recommend', 'mkt-behavioral'],
+                sections: [
+                    {
+                        title: '📌 定義 (Intelligent Marketing)',
+                        content: '利用人工智慧 (AI) 相關技術 (如深度學習、聊天機器人、增強式學習) 進行網路行銷。 [cite: 2451, 2720, 2722, 2758, 2790]'
+                    },
+                    {
+                        title: '💡 三種主要應用',
+                        list: [
+                            '網路行銷 + 深度學習 (DL): 利用 DL 掌握消費者在網路上留下的「足跡」 (社群 Po 文、瀏覽、購物紀錄)，建立預測模式，了解消費者真正的偏好。 [cite: 2723, 2724] 例如 Netflix 推薦 [cite: 2725]、Amazon「預測式出貨」 [cite: 2726]、Amazon Go [cite: 2726]。',
+                            '網路行銷 + 聊天機器人 (Chatbot): 利用 Chatbot 自動化處理顧客關係管理的對話。 [cite: 2758, 2759]',
+                            '網路行銷 + AI 廣告績效偵測: 利用「增強式學習」(Reinforcement Learning)，不斷偵測消費者對廣告的「轉換率」(Conversion Rate)，並自動調整策略以提升廣告績效。 [cite: 2790, 2791]'
+                        ]
+                    }
+                ]
+            },
+            'omni-channel': {
+                title: '商業 4.0 / 全通路 / 新零售',
+                icon: 'combine',
+                relations: ['o2o', 'model-retailer'],
+                sections: [
+                    {
+                        title: '📌 定義: 商業 4.0 全通路模式',
+                        content: '整合大數據、物聯網、雲端、行動、社群等技術，建構「以消費者為核心」，虛實整合的「全通路經營模式」(Omni-Channel)。 [cite: 1761, 1762]'
+                    },
+                    {
+                        title: '🔑 核心理念',
+                        content: '在與顧客接觸的「所有通路」 (實體店、購物網站、行動購物、客服中心、社群商務等)，提供顧客「一致性、標準化、整合性」的購物體驗。 [cite: 1762] 消費者可在所有通路中無間隙地自由移動，不會有矛盾衝突的體驗。 [cite: 1762]'
+                    },
+                    {
+                        title: '🆚 通路演進',
+                        list: [
+                            '多通路 (Multi-Channel): 各通路 (實體、網購、電視購物) 彼此獨立，甚至相互競爭，資料庫未整合。 [cite: 1689, 1690, 1836]',
+                            '跨通路 (Cross-Channel): 各通路仍獨立管理，但「相互合作」 (如交叉銷售)，資料庫初步整合。 [cite: 1704, 1706]',
+                            '全通路 (Omni-Channel): 各通路「融合成同一部門」，擁有「單一來源的資料庫」，以提供個人化服務為終極目標。 [cite: 1763, 1837]'
+                        ]
+                    },
+                    {
+                        title: '💡 實踐: 新零售 (New Retail)',
+                        content: '2016 年馬雲提出。 [cite: 1815] 以「消費者體驗為中心」，利用 AI、Big Data 等技術，支援線下的服務體驗與物流，以及線上的商流、金流、資訊流。 [cite: 1815] 例如: 阿里巴巴的「盒馬鮮生」 (超市 + 餐廳 + 30 分鐘配送 + APP 下單 + 支付寶支付)。 [cite: 1816-1821]'
+                    }
+                ]
+            },
+            'cloud-definition': {
+                title: '雲端運算 - 定義與特徵',
+                icon: 'cloud',
+                relations: ['model-asp', 'cloud-iaas', 'cloud-paas', 'cloud-saas', 'cloud-deployment'],
+                sections: [
+                    {
+                        title: '📌 意義 (Cloud Computing)',
+                        content: '近端的使用者透過網際網路，以「用多少算多少」(pay-as-you-go)、「隨選公用運算模式」，來取得遠端 IT 專業廠商所提供的 IT 資源、平台及系統的一種「IT 服務模式」。 [cite: 1964, 1966]'
+                    },
+                    {
+                        title: '⭐ NIST 定義的 5 種特徵 [cite: 1967, 1949]',
+                        list: [
+                            '依需要自助服務 (On-demand self-service): 客戶需要時，能自助獲得運算能力。 [cite: 1969, 1979]',
+                            '無所不在使用網路 (Ubiquitous network access): 雲端資源利用網路隨時隨地使用。 [cite: 1970, 1980]',
+                            '無關位置的資源庫 (Location-independent resource pooling): 客戶不需知道資源的確切位置，由雲端商動態指派虛擬資源。 [cite: 1971, 1982]',
+                            '快速彈性 (Rapid elasticity): 運算資源可以快速、彈性地增減，以符合客戶改變。 [cite: 1973, 1984]',
+                            '可衡量的服務 (Measured service): 收費基於「實際使用」的資源量。 [cite: 1975, 1985]'
+                        ]
+                    }
+                ]
+            },
+            'cloud-iaas': {
+                title: 'IaaS - 基礎設施即服務',
+                icon: 'server',
+                relations: ['model-asp', 'cloud-definition', 'cloud-paas', 'cloud-saas'],
+                sections: [
+                    {
+                        title: '📌 定義 (Infrastructure as a Service)',
+                        content: '客戶向雲端服務商租用「基礎運算資源」，如處理能力、儲存空間、網路元件等。 [cite: 2044] 客戶在此基礎上運作他們「自己」的作業系統和資訊系統。 [cite: 2044]'
+                    },
+                    {
+                        title: '💡 目的',
+                        content: '節省企業自行建構基礎建設的人力、時間和費用。 [cite: 2044] 企業需自行管理 OS、DBMS 和應用軟體。 [cite: 2047, 2048]'
+                    },
+                    {
+                        title: '🎯 應用',
+                        list: [
+                            'Amazon Web Services (AWS) [cite: 2091]',
+                            'Microsoft Azure [cite: 2091]'
+                        ]
+                    }
+                ]
+            },
+            'cloud-paas': {
+                title: 'PaaS - 平台即服務',
+                icon: 'box',
+                relations: ['model-asp', 'cloud-definition', 'cloud-iaas', 'cloud-saas'],
+                sections: [
+                    {
+                        title: '📌 定義 (Platform as a Service)',
+                        content: '客戶使用雲端服務商提供的「基礎建設」和「程式工具」(如作業系統、DBMS)，來「開發」並執行他們「自己」的應用系統。 [cite: 2045, 2068, 2073]'
+                    },
+                    {
+                        title: '💡 目的',
+                        content: '免除架設硬體、網路及作業平台的時間及金錢 [cite: 2045]，讓開發者專注於應用程式開發。企業需自行管理應用軟體。 [cite: 2062]'
+                    },
+                    {
+                        title: '🎯 應用',
+                        list: [
+                            'Google App Engine',
+                            'Heroku',
+                            'SAP Cloud Platform [cite: 1195]'
+                        ]
+                    }
+                ]
+            },
+            'cloud-saas': {
+                title: 'SaaS - 軟體即服務',
+                icon: 'app-window',
+                relations: ['model-asp', 'cloud-definition', 'cloud-iaas', 'cloud-paas'],
+                sections: [
+                    {
+                        title: '📌 定義 (Software as a Service)',
+                        content: '客戶「直接使用」雲端服務商提供的「軟體應用系統」。 [cite: 2046, 2077, 2079] 這是最完整的服務，客戶幾乎不需管理任何底層架構。'
+                    },
+                    {
+                        title: '💡 目的',
+                        content: '使用者只需透過網路 (如 Web 瀏覽器) 即可存取軟體，無需在本地安裝或維護。 [cite: 2005]'
+                    },
+                    {
+                        title: '🎯 應用',
+                        list: [
+                            'Google Workspace (Gmail, Docs)',
+                            'Salesforce (CRM)',
+                            'Microsoft 365'
+                        ]
+                    }
+                ]
+            },
+            'cloud-deployment': {
+                title: '雲端運算 - 4大部署模式',
+                icon: 'cloud-cog',
+                relations: ['cloud-definition'],
+                sections: [
+                    {
+                        title: '📌 依組織觀點分類 [cite: 2090]',
+                        content: 'NIST 定義了四種部署模式：'
+                    },
+                    {
+                        title: '💡 模式',
+                        list: [
+                            '公有雲 (Public Cloud): 由雲端服務商建立，提供給「大眾」使用。 [cite: 2091] (例如: Google, AWS [cite: 2091])',
+                            '私有雲 (Private Cloud): 由「單一組織」建立，只供該組織內部使用。 [cite: 2092] 組織自行購買、擁有、管理 IT 資源，目的是提升內部資源利用率與安全性。 [cite: 2092]',
+                            '社群雲 (Community Cloud): 由「一群擁有共同任務」的組織共同成立，服務該特定社群。 [cite: 2093] (例如: 衛福部電子病歷交換雲端平臺 [cite: 2093, 2122])',
+                            '混合雲 (Hybrid Cloud): 結合「兩種以上」的雲端架構 (公有、私有或社群)，透過技術讓資料與應用程式擁有可攜性。 [cite: 2094, 2109]'
+                        ]
+                    }
+                ]
+            }
+        };
+
+        function showDetail(key) {
+            const data = content[key];
+            if (!data) return;
+
+            let html = `
+                <div class="modal-title">
+                    <i data-lucide="${data.icon}" style="width: 40px; height: 40px;"></i>
+                    <span>${data.title}</span>
+                </div>
+            `;
+
+            // 顯示相關技術
+            if (data.relations && data.relations.length > 0) {
+                html += '<div style="margin-bottom: 20px; padding: 15px; background: linear-gradient(135deg, #f5f7fa 0%, #e8ecf4 100%); border-radius: 10px; border-left: 4px solid #667eea;">';
+                html += '<strong style="color: #667eea;">🔗 相關技術連結:</strong><br>';
+                data.relations.forEach(rel => {
+                    if (content[rel]) {
+                        html += `<span class="relation-tag" style="cursor: pointer; margin: 5px;" onclick="showDetail('${rel}')">${content[rel].title.split('/')[0].split('-')[0].trim()}</span>`;
+                    }
+                });
+                html += '</div>';
+            }
+
+            data.sections.forEach(section => {
+                html += `<div class="modal-section">`;
+                if (section.title) {
+                    html += `<h3>${section.title}</h3>`;
+                }
+                if (section.content) {
+                    // Replace  and [cite: numbers] with styled spans
+                    let formattedContent = section.content
+                        .replace(/\[cite_start\]/g, '')
+                        .replace(/\[cite:\s*([0-9,\s]+)\]/g, (match, p1) => {
+                            return `<span style="color: #667eea; font-size: 0.8em; font-weight: bold; margin-left: 4px;">[${p1}]</span>`;
+                        });
+                    html += `<div>${formattedContent}</div>`;
+                }
+                if (section.list) {
+                    html += `<ul>`;
+                    section.list.forEach(item => {
+                        // Replace  and [cite: numbers] with styled spans in list items
+                        let formattedItem = item
+                            .replace(/\[cite_start\]/g, '')
+                            .replace(/\[cite:\s*([0-9,\s]+)\]/g, (match, p1) => {
+                                return `<span style="color: #667eea; font-size: 0.8em; font-weight: bold; margin-left: 4px;">[${p1}]</span>`;
+                            });
+                        html += `<li>${formattedItem}</li>`;
+                    });
+                    html += `</ul>`;
+                }
+                html += `</div>`;
+            });
+
+            document.getElementById('modal-body').innerHTML = html;
+            document.getElementById('modal').classList.add('active');
+            
+            // Re-initialize lucide icons
+            lucide.createIcons();
+        }
+
+        function closeModal() {
+            document.getElementById('modal').classList.remove('active');
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('modal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+
+        // Close modal with Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeModal();
+            }
+        });
+
+        // Initialize lucide icons
+        lucide.createIcons();
+    </script>
+</body>
+</html>
